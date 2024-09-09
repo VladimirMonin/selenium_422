@@ -6,37 +6,7 @@ from time import sleep
 # Создание экземпляра браузера
 # driver = webdriver.Firefox()
 driver = webdriver.Chrome()
-
-# Переход на сайт гугла
-driver.get("https://www.google.com/")
-
-# Ищем элемент по тегу texarea
-# driver.find_element_by.... УСТАРЕЛО
-# НАС ИНТЕРЕСУЕТ ИНТРУМЕНТ By
-search_form = driver.find_element(By.TAG_NAME, "textarea")
-
-# Ввод поискового запроса
-search_form.send_keys("Котики фото")
-
-# Отправка поискового запроса 
-search_form.submit()
-
-# Поискать тег a с классом nPDzT 
-image_button = driver.find_element(By.CSS_SELECTOR, "a.nPDzT")
-
-# клик
-image_button.click()
-
-# Имитация прокрутки колесом мыши
-for i in range(10):
-    sleep(2)
-    driver.execute_script("window.scrollBy(0, 1000);")
-
-
-# Пауза 5 секунд
-sleep(10)
-driver.quit()
-
+MAIN_URL = 'https://books.toscrape.com/'
 # Методы поиска элементов
 # find_element - Найдет первый попавшийся элемент
 # find_elements - Найдет все элементы
@@ -53,3 +23,41 @@ driver.quit()
 # click - Вызывает событие клика по элементу
 # send_keys - Вызывает событие ввода текста в элемент
 # submit - Вызывает событие отправки формы
+
+# webElement - служебный объект, который возвращается при поиске элемента
+
+# Переход на сайт books.toscrape.com
+driver.get(MAIN_URL)
+sleep(1)
+# Найти все элементы с классом product_pod
+books = driver.find_elements(By.CLASS_NAME, "product_pod")
+
+
+
+"""
+https://books.toscrape.com/
+catalogue/a-light-in-the-attic_1000/index.html
+
+https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html
+
+https://books.toscrape.com/
+media/cache/2c/da/2cdad67c44b002e7ead0cc35693c0e8b.jpg
+
+https://books.toscrape.com/media/cache/2c/da/2cdad67c44b002e7ead0cc35693c0e8b.jpg
+
+0. Полный заголовок книги атрибут title в ссылке в заголовке h3 > a['title']
+1. Первый тег a href - ссылка на детальное отображение товара
+2. Первый тег а img src - ссылка на обложку
+3. p.price_color - цена в формате £51.77 (отрезать фунты и сделать флоат)
+4. p.instock - если есть второй класс availability - доступно в продаже
+5. Оценка p.star-rating нам нужен его второй класс (One Two Three Four Five) - оценка
+
+"""
+
+for book in books:
+    # h3 - Заголовок книги
+    title = book.find_element(By.TAG_NAME, "h3").text
+    print(title)
+    # Полный текст живет в аттрибуте title
+    full_title = book.find_element(By.CSS_SELECTOR, "h3 > a").get_attribute("title")
+    print(full_title)
